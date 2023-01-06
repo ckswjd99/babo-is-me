@@ -1,2 +1,2 @@
-# babo-is-me
-Clone of game "Baba is you"
+# pygame-window
+Create windows in pygame

@@ -8,7 +8,8 @@ class TopBarWindow(Window):
   def __init__(
     self, x, y, w, h,
     isValid=True, isResizable=True, zAxis=0,
-    getMouseEventOn=WindowCondition.FOCUSED, getKeyEventOn=WindowCondition.FOCUSED
+    getMouseEventOn=WindowCondition.FOCUSED, getKeyEventOn=WindowCondition.FOCUSED,
+    caption='Window'
   ):
     super().__init__(x, y, w, h, isValid, isResizable, zAxis, getMouseEventOn, getKeyEventOn)
 
@@ -16,17 +17,26 @@ class TopBarWindow(Window):
     self.dragging = False
     self.dragStartGlobalPos = None
     self.dragStartLocalPos = None
+    self.caption = caption
 
     # Set TopBar
-    topbar = ButtonElement(0, 0, self.w, 30, 'TopBar').setStyle(
-      backgroundColor=(127, 127, 127), borderColor=(95, 95, 95), borderRadius=0, borderWidth=2
+    topbar = ButtonElement(0, 0, self.w, 30, self.caption).setStyle(
+      backgroundColor=(127, 127, 127), 
+      borderColor=(95, 95, 95), 
+      borderRadius=0, 
+      borderWidth=2,
+      textColor=(255, 255, 255),
+    ).setFontStyle(
+      fontSize=24,
+      verticalAlign='center',
+      horizontalAlign='left'
     ).setAction(
       onClick=self.startDrag, onRelease=self.finishDrag
     )
     self.addElement(topbar)
 
     # Set BarButton
-    invalidateButton = ButtonElement(self.w-25, 5, 20, 20).setStyle(
+    invalidateButton = ButtonElement(self.w-25, 5, 20, 20, '').setStyle(
       backgroundColor=(220, 100, 100), borderColor=(150, 75, 75), borderRadius=1, borderWidth=1
     ).setAction(onClick=self.invalidate)
     self.addElement(invalidateButton)

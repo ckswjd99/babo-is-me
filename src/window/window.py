@@ -44,15 +44,19 @@ class Window:
   def focus(self):
     self.parentScreen.windows.remove(self)
     self.parentScreen.windows.insert(0, self)
+    return self
   
   def validate(self):
     self.isValid = True
+    return self
 
   def invalidate(self):
     self.isValid = False
+    return self
 
   def destroy(self):
     self.parentScreen.windows.remove(self)
+    return self
   
   def getPosition(self):
     return (self.x, self.y)

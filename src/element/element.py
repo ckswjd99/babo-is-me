@@ -45,7 +45,6 @@ class Element:
   def setStyle(self, **kwargs):
     for key, val in kwargs.items():
       if key in self.style:
-        print(key, val)
         self.style[key] = val
     return self
   

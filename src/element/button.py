@@ -23,6 +23,7 @@ class ButtonElement(Element):
 
     # Styles
     self.style = {
+      'padding'                 : 6,
       'image'                   : None,
       'imageCommon'             : None,
       'imageHover'              : None,
@@ -41,12 +42,23 @@ class ButtonElement(Element):
       'textColorPressed'        : (  0,   0,   0),
       'borderWidth'             : 1,
       'borderRadius'            : 3,
+    }
+
+    # Font configs
+    self.fontStyle = {
       'fontName'                : 'arial',
       'fontSize'                : 14,
       'bold'                    : False,
       'italic'                  : False,
-      'textAlign'               : 'center',
+      'verticalAlign'           : 'center',
+      'horizontalAlign'         : 'center',
     }
+    self.font = pygame.font.SysFont(
+      self.fontStyle['fontName'], 
+      self.fontStyle['fontSize'], 
+      self.fontStyle['bold'], 
+      self.fontStyle['italic']
+    )
 
     # Actions
     self.action = {
@@ -55,10 +67,27 @@ class ButtonElement(Element):
       'onRelease' : None,
     }
     
+  def setFontStyle(self, **kwargs):
+    modified = False
+    for key, val in kwargs.items():
+      if key in self.fontStyle:
+        self.fontStyle[key] = val
+
+    if modified:
+      self.font = pygame.font.SysFont(
+        self.fontStyle['fontName'], 
+        self.fontStyle['fontSize'], 
+        self.fontStyle['bold'], 
+        self.fontStyle['italic']
+      )
+    return self
+
+
   def setAction(self, **kwargs):
     for key, val in kwargs.items():
       if key in self.action:
         self.action[key] = val
+    
     return self
 
   def takeEvent(self, event):
@@ -71,7 +100,6 @@ class ButtonElement(Element):
   def update_self(self):
     # Calculate next state
     nextState = self.state
-    dragged = False
     for event in self.events:
       if event.type in MOUSE_EVENTS:
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -80,7 +108,6 @@ class ButtonElement(Element):
           nextState = ButtonState.HOVER
         elif event.type == pygame.MOUSEMOTION and self.state == ButtonState.PRESSED:
           nextState = ButtonState.PRESSED
-          dragged = True
         elif event.type == pygame.MOUSEMOTION and self.state != ButtonState.PRESSED:
           nextState = ButtonState.HOVER
     
@@ -99,12 +126,12 @@ class ButtonElement(Element):
     # Update state
     self.state = nextState
 
-    pass
   
   def render_self(self, surface):
     renderImage = None
     backgroundColor = None
     borderColor = None
+    captionColor = None
 
     # Defaults
     if self.style['image']:
@@ -112,6 +139,7 @@ class ButtonElement(Element):
     elif self.style['backgroundColor'] and self.style['borderColor']:
       backgroundColor = self.style['backgroundColor']
       borderColor = self.style['borderColor']
+      captionColor = self.style['textColor']
 
     # COMMON state
     elif self.state == ButtonState.COMMON:
@@ -120,6 +148,7 @@ class ButtonElement(Element):
       else:
         backgroundColor = self.style['backgroundColorCommon']
         borderColor = self.style['borderColorCommon']
+        captionColor = self.style['textColorCommon']
 
     # HOVER state
     elif self.state == ButtonState.HOVER:
@@ -128,6 +157,7 @@ class ButtonElement(Element):
       else:
         backgroundColor = self.style['backgroundColorHover']
         borderColor = self.style['borderColorHover']
+        captionColor = self.style['textColorHover']
 
     # PRESSED state
     elif self.state == ButtonState.PRESSED:
@@ -136,6 +166,7 @@ class ButtonElement(Element):
       else:
         backgroundColor = self.style['backgroundColorPressed']
         borderColor = self.style['borderColorPressed']
+        captionColor = self.style['textColorPressed']
 
     # Render button
     if renderImage:
@@ -155,4 +186,26 @@ class ButtonElement(Element):
         width=self.style['borderWidth'],
         border_radius=self.style['borderRadius']
       )
+    
+    # Render caption
+    if self.caption != '':
+      renderedCaption = self.font.render(self.caption, True, captionColor)
+      captionX = 0
+      captionY = 0
+
+      if self.fontStyle['horizontalAlign'] == 'center':
+        captionX = self.x + self.w/2 - renderedCaption.get_width()/2
+      elif self.fontStyle['horizontalAlign'] == 'right':
+        captionX = self.x + self.w - self.style['padding'] - renderedCaption.get_width()
+      else:
+        captionX = self.x + self.style['padding']
+
+      if self.fontStyle['verticalAlign'] == 'center':
+        captionY = self.y + self.h/2 - renderedCaption.get_height()/2
+      elif self.fontStyle['verticalAlign'] == 'bottom':
+        captionY = self.y + self.h - self.style['padding'] - renderedCaption.get_height()
+      else:
+        captionY = self.y + self.style['padding']
+
+      surface.blit(renderedCaption, (captionX, captionY))
 
